@@ -4,7 +4,6 @@ const additem = async (req, res) => {
   try {
 
     const { name, price, desc, category, img } = req.body;
-
     const existingItem = await menuModel.findOne({ name });
 
     if (existingItem) {
@@ -38,7 +37,6 @@ const additem = async (req, res) => {
 
 const allitem = async (req, res) => {
   try {
-
     const items = await menuModel.find();
 
     res.status(200).json({

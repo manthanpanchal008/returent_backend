@@ -1,20 +1,12 @@
-const app = require('./src/app');
-const dotenv = require('dotenv');
-const dbconnect = require('./src/db/db');
+require("dotenv").config();
 
-const cors = require("cors");
+const app = require("./src/app");
+const dbconnect = require("./src/db/db");
 
-app.use(cors({
-  origin: "*",
-  credentials: true
-}));
-
-dotenv.config();
-dbconnect();
 const PORT = process.env.PORT || 5000;
-try {
-app.listen(PORT,()=> {console.log(`server is running on port ${PORT}`)})
-    
-} catch (error) {
-    console.log("error",error)
-}
+
+dbconnect();
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

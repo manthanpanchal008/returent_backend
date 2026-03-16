@@ -1,17 +1,25 @@
-const express = require('express');
-const authrouter = require('./routes/auth.routes');
-const menurouter = require('./routes/menu.routes')
-const cookieParser = require('cookie-parser')
+const express = require("express");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
+const authRoutes = require("./routes/auth.routes");
+const menuRoutes = require("./routes/menu.routes");
 
-const app = express()
+const app = express();
 
+app.use(express.json());
+app.use(cookieParser());
 
-app.use(express.json())
-app.use(cookieParser())
+app.use(cors({
+  origin: "*",
+  credentials: true
+}));
 
+app.get("/", (req,res)=>{
+    res.send("API is running");
+  });
+// routes
+app.use("/api/auth", authRoutes);
+app.use("/api/menuiteams", menuRoutes);
 
-app.use('/api/auth',authrouter)
-app.use('/api/menuiteams',menurouter)
-
-module.exports = app
+module.exports = app;
