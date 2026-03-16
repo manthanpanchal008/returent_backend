@@ -11,10 +11,13 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(cors({
-  origin: "*",
+  origin: [
+    "http://localhost:5000",
+    "http://localhost:5173",
+    "https://returent-backend.onrender.com"
+  ],
   credentials: true
 }));
-
 app.get("/", (req,res)=>{
     res.send("API is running");
   });
