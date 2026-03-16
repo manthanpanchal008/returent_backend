@@ -1,30 +1,58 @@
 const menuModel = require("../model/menu.model");
 
 const additem = async (req, res) => {
-  const { name, price, desc, category, img } = req.body;
-  //check for already exists or not
-  const isMenuIteamExist = await menuModel.findOne({ name });
+  try {
 
-  if (isMenuIteamExist) {
-    return res.status(400).json({ message: "Iteam already exist" });
+    const { name, price, desc, category, img } = req.body;
+
+    const existingItem = await menuModel.findOne({ name });
+
+    if (existingItem) {
+      return res.status(400).json({
+        message: "Item already exists"
+      });
+    }
+
+    const newItem = await menuModel.create({
+      name,
+      price,
+      desc,
+      category,
+      img,
+    });
+
+    res.status(201).json({
+      message: "Item created successfully",
+      data: newItem
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: "Error creating item",
+      error: error.message
+    });
+
   }
-
-  const newiteam = await menuModel.create({
-    name,
-    price,
-    desc,
-    category,
-    img,
-  });
-  res.status(200).json({ message: "new iteam creaeted succefully", newiteam });
 };
 
 const allitem = async (req, res) => {
   try {
-    const getallitems = await menuModel.find();
-    res.status(200).json({ message: "fetch sucessfully", menu: getallitems });
+
+    const items = await menuModel.find();
+
+    res.status(200).json({
+      message: "Items fetched successfully",
+      data: items
+    });
+
   } catch (error) {
-    res.status(400).json({ message: "error while fetching menu", error });
+
+    res.status(500).json({
+      message: "Error while fetching menu",
+      error: error.message
+    });
+
   }
 };
 
