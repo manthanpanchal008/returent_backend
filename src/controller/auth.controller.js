@@ -32,7 +32,7 @@ const register = async (req, res) => {
 
   // Set token in cookie and respond
   res.cookie("token", token);
-  res.status(200).json({ messgae: "Register succesfully" ,user});
+  res.status(200).json({ messgae: "Register succesfully", user });
 };
 
 // Login existing user
@@ -63,4 +63,83 @@ const login = async (req, res) => {
   res.status(200).json({ messgae: "login successful" });
 };
 
-module.exports = { register, login };
+const users = async (req, res) => {
+  try {
+    const users = await userModel.find();
+    res.status(200).json({ message: "users fetch successfully", data: users });
+  } catch (error) {
+    res.status(400).json({
+      message: "error while fetching all users",
+      error: error.message,
+    });
+  }
+};
+
+const updateUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { username, name, email, phone, password } = req.body;
+
+    let updateData = {
+      username,
+      name,
+      email,
+      phone,
+    };
+
+    // If password is provided → hash it
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateData.password = hashedPassword;
+    }
+
+    const updatedUser = await userModel.findByIdAndUpdate(
+      userId,
+      updateData,
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "User updated successfully",
+      data: updatedUser,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Error updating user",
+      error: error.message,
+    });
+  }
+};
+
+const deleteUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const deletedUser = await userModel.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "User deleted successfully",
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Error deleting user",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = { register, login, users ,updateUser,deleteUser};

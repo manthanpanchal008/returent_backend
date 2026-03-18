@@ -22,7 +22,7 @@ const menuSchema = new mongoose.Schema(
       default: 4,
     },
   },
-  { timestamps: true }
+  { timestamps: true }// Automatically add createdAt and updatedAt
 );
 
 const menuModel = mongoose.model("menu", menuSchema);

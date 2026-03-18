@@ -4,6 +4,10 @@ const cookieParser = require("cookie-parser");
 
 const authRoutes = require("./routes/auth.routes"); // Auth-related routes
 const menuRoutes = require("./routes/menu.routes"); // Menu-related routes
+const teamRoutes = require("./routes/team.routes") //team-related routes
+const servicesRoutes = require("./routes/services.routes") // services-realted routes
+const eventsRoutes = require("./routes/events.routes") ///event routes
+const blogRoutes = require("./routes/blog.routes") //blog routes
 
 const app = express();
 
@@ -30,6 +34,10 @@ app.use(cors({
 
 // API routes
 app.use("/api/auth", authRoutes);
-app.use("/api/menuiteams", menuRoutes);
+app.use("/api/menu", menuRoutes);
+app.use("/api/team", teamRoutes);
+app.use("/api/services", servicesRoutes);
+app.use("/api/events", eventsRoutes);
+app.use("/api/blog", blogRoutes);
 
 module.exports = app; // Export app for server.js

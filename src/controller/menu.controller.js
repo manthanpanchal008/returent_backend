@@ -58,4 +58,79 @@ const allitem = async (req, res) => {
   }
 };
 
-module.exports = { additem, allitem };
+//update item
+const updateItem = async (req, res) => {
+  try {
+    const itemId = req.params.id;
+    const { name, price, desc, category } = req.body;
+    const file = req.file;
+
+    const item = await menuModel.findById(itemId);
+
+    if (!item) {
+      return res.status(404).json({
+        message: "Item not found",
+      });
+    }
+
+    let updatedData = {};
+
+    if (name) updatedData.name = name;
+    if (price) updatedData.price = price;
+    if (desc) updatedData.desc = desc;
+    if (category) updatedData.category = category;
+
+    // If new image uploaded
+    if (file) {
+      const imgResult = await imagekit.files.upload({
+        file: file.buffer.toString("base64"),
+        fileName: file.originalname,
+        folder: "food-items",
+      });
+
+      updatedData.img = imgResult.url;
+    }
+
+    const updatedItem = await menuModel.findByIdAndUpdate(
+      itemId,
+      updatedData,
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: "Item updated successfully",
+      data: updatedItem,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Error updating item",
+      error: error.message,
+    });
+  }
+};
+
+const deleteItem = async (req, res) => {
+  try {
+    const itemId = req.params.id;
+
+    const deletedItem = await menuModel.findByIdAndDelete(itemId);
+
+    if (!deletedItem) {
+      return res.status(404).json({
+        message: "Item not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Item deleted successfully",
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Error deleting item",
+      error: error.message,
+    });
+  }
+};
+module.exports = { additem, allitem,updateItem ,deleteItem};
