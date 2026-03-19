@@ -28,8 +28,8 @@ const register = async (req, res) => {
   });
 
   // Generate JWT token
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-
+  const token = jwt.sign({ id: user._id,role:user.role }, process.env.JWT_SECRET);
+  console.log(token)
   // Set token in cookie and respond
   res.cookie("token", token);
   res.status(200).json({ messgae: "Register succesfully", user });

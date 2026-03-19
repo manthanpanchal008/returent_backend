@@ -54,4 +54,76 @@ const getallgallary = async (req, res) => {
   }
 };
 
-module.exports = { addgallary, getallgallary };
+const updategallary = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { category } = req.body;
+      const image = req.file;
+  
+      let updateData = {};
+  
+      // update category if provided
+      if (category) {
+        updateData.category = category;
+      }
+  
+      // if new image uploaded → upload to ImageKit
+      if (image) {
+        const imgResult = await imagekit.files.upload({
+          file: image.buffer.toString("base64"),
+          fileName: image.originalname,
+          folder: "events",
+        });
+  
+        updateData.img = imgResult.url;
+      }
+  
+      const updated = await eventsModel.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true }
+      );
+  
+      if (!updated) {
+        return res.status(404).json({
+          message: "Gallery item not found",
+        });
+      }
+  
+      return res.status(200).json({
+        message: "Gallery updated successfully",
+        data: updated,
+      });
+  
+    } catch (error) {
+      return res.status(500).json({
+        message: "Error updating gallery",
+        error: error.message,
+      });
+    }
+  };
+
+const deletegallary = async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      const deleted = await eventsModel.findByIdAndDelete(id);
+  
+      if (!deleted) {
+        return res.status(404).json({
+          message: "Gallery item not found",
+        });
+      }
+  
+      return res.status(200).json({
+        message: "Gallery deleted successfully",
+      });
+  
+    } catch (error) {
+      return res.status(500).json({
+        message: "Error deleting gallery",
+        error: error.message,
+      });
+    }
+  }; 
+module.exports = { addgallary, getallgallary ,updategallary,deletegallary};

@@ -1,5 +1,5 @@
 const blogModel = require("../model/blog.model");
-const imagekit = require("../utils/imagekitconfig");    
+const imagekit = require("../utils/imagekitconfig");
 
 // ✅ Add Blog
 const addBlog = async (req, res) => {
@@ -25,7 +25,6 @@ const addBlog = async (req, res) => {
       message: "Blog added successfully",
       data: blog,
     });
-
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -38,15 +37,12 @@ const addBlog = async (req, res) => {
 // ✅ Get All Blogs
 const getAllBlogs = async (req, res) => {
   try {
-    const blogs = await blogModel
-      .find()
-      .sort({ createdAt: -1 });
+    const blogs = await blogModel.find().sort({ createdAt: -1 });
 
     return res.status(200).json({
       count: blogs.length,
       data: blogs,
     });
-
   } catch (error) {
     return res.status(500).json({
       message: "Error fetching blogs",
@@ -55,4 +51,76 @@ const getAllBlogs = async (req, res) => {
   }
 };
 
-module.exports = { addBlog, getAllBlogs };
+const updateBlog = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { topic, desc } = req.body;
+    const image = req.file;
+
+    let updateData = {};
+
+    if (topic) updateData.topic = topic;
+    if (desc) updateData.desc = desc;
+
+    // if new image uploaded
+    if (image) {
+      const imgResult = await imagekit.files.upload({
+        file: image.buffer.toString("base64"),
+        fileName: image.originalname,
+        folder: "blog",
+      });
+
+      updateData.img = imgResult.url;
+    }
+
+    const updated = await blogModel.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
+
+    if (!updated) {
+      return res.status(404).json({
+        message: "Blog not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Blog updated successfully",
+      data: updated,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error updating blog",
+      error: error.message,
+    });
+  }
+};
+
+const deleteBlog = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deleted = await blogModel.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return res.status(404).json({
+        message: "Blog not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Blog deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error deleting blog",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  addBlog,
+  getAllBlogs,
+  updateBlog,
+  deleteBlog,
+};

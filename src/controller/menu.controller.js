@@ -41,23 +41,6 @@ const additem = async (req, res) => {
   }
 };
 
-// Get all menu items
-const allitem = async (req, res) => {
-  try {
-    const items = await menuModel.find();
-
-    res.status(200).json({
-      message: "Items fetched successfully",
-      data: items,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Error while fetching menu",
-      error: error.message,
-    });
-  }
-};
-
 //update item
 const updateItem = async (req, res) => {
   try {
@@ -133,4 +116,32 @@ const deleteItem = async (req, res) => {
     });
   }
 };
+
+const allitem = async (req, res) => {
+  try {
+    const { category } = req.query;
+
+    let filter = {};
+
+    // if category is provided → filter
+    if (category) {
+      filter.category = { $regex: category, $options: "i" };;
+    }
+
+    const items = await menuModel.find(filter);
+
+    res.status(200).json({
+      message: "Items fetched successfully",
+      count: items.length,
+      data: items,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Error while fetching menu",
+      error: error.message,
+    });
+  }
+};
 module.exports = { additem, allitem,updateItem ,deleteItem};
+

@@ -1,7 +1,6 @@
 const teamModel = require("../model/team.model");
 const imagekit = require("../utils/imagekitconfig");
 
-
 const addteam = async (req, res) => {
   try {
     const { name, position, socialmedia } = req.body;
@@ -33,7 +32,6 @@ const addteam = async (req, res) => {
       message: "Team member added successfully",
       data: teammember,
     });
-
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -51,7 +49,6 @@ const getallteam = async (req, res) => {
       message: "Team members fetched successfully",
       data: team,
     });
-
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -61,5 +58,77 @@ const getallteam = async (req, res) => {
   }
 };
 
+const updateteam = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, position, socialmedia } = req.body;
+    const image = req.file;
 
-module.exports = { addteam,getallteam };
+    let updateData = {};
+
+    if (name) updateData.name = name;
+    if (position) updateData.position = position;
+    if (socialmedia) updateData.socialmedia = socialmedia;
+
+    // if new image uploaded
+    if (image) {
+      const imgResult = await imagekit.files.upload({
+        file: image.buffer.toString("base64"),
+        fileName: image.originalname,
+        folder: "team",
+      });
+
+      updateData.profile = imgResult.url;
+    }
+
+    const updated = await teamModel.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
+
+    if (!updated) {
+      return res.status(404).json({
+        message: "Team member not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Team member updated successfully",
+      data: updated,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error updating team member",
+      error: error.message,
+    });
+  }
+};
+
+const deleteteam = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deleted = await teamModel.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return res.status(404).json({
+        message: "Team member not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Team member deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error deleting team member",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  addteam,
+  getallteam,
+  updateteam,
+  deleteteam,
+};
