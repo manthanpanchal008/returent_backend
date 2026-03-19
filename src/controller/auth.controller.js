@@ -1,6 +1,7 @@
 const userModel = require("../model/user.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../service/sendMail");
 
 // Register new user
 const register = async (req, res) => {
@@ -47,7 +48,7 @@ const login = async (req, res) => {
   if (!userexits) {
     return res.status(400).json({ messgae: "invalid credentials" });
   }
-
+  await sendEmail('manthanpanchal008@gmail.com',131213);
   // Verify password
   const verifypassword = await bcrypt.compare(password, userexits.password);
 

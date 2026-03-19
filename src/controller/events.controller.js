@@ -38,8 +38,13 @@ const addgallary = async (req, res) => {
 // ✅ Get All Gallery Images
 const getallgallary = async (req, res) => {
   try {
+    let filter = {};
+    const { category } = req.query;
+    if (category) {
+        filter.category = { $regex: category, $options: "i" };;
+      }
     const images = await eventsModel
-      .find()
+      .find(filter)
 
     return res.status(200).json({
         message:"images fetch successfully",

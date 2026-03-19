@@ -12,7 +12,13 @@ const userSchema = new mongoose.Schema({
     enum: ["USER", "ADMIN"],
     required: true,
     default: "USER",
-  }, 
+  },
+  otp: String,
+otpExpiry: Date,
+isVerified: {
+  type: Boolean,
+  default: false
+}
 });
 
 const userModel = mongoose.model('user', userSchema);
