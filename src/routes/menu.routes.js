@@ -5,7 +5,7 @@ const upload = require('../middleware/upload');
 const router = express.Router();
 
 
-router.post('/', upload.single("image"), additem);
+router.post('/:id', upload.single("image"), additem);
 router.get('/', allitem);
 router.put("/update/:id", upload.single("image"), updateItem);
 router.delete("/delete/:id", deleteItem);
