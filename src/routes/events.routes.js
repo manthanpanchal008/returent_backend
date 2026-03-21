@@ -4,7 +4,8 @@ const upload = require('../middleware/upload');
 
 const router = express.Router()
 
-router.get('/:id',getallgallary)
+router.get('/',getallgallary)
+router.get('/:id', getallgallary);
 router.post('/',upload.single("image"),addgallary)
 router.put("/:id", upload.single("image"), updategallary);
 router.delete("/:id", deletegallary);

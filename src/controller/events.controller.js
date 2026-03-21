@@ -38,17 +38,30 @@ const addgallary = async (req, res) => {
 // ✅ Get All Gallery Images
 const getallgallary = async (req, res) => {
   try {
-    let filter = {};
+    console.log("hit");
 
     const { id } = req.params;
     const { category } = req.query;
 
-    // ✅ If ID is provided
+    // ✅ If ID is provided → return single item
     if (id) {
-      filter._id = id;
+      const image = await eventsModel.findById(id);
+
+      if (!image) {
+        return res.status(404).json({
+          message: "Image not found",
+        });
+      }
+
+      return res.status(200).json({
+        message: "Single image fetched",
+        data: image, // ✅ object (not array)
+      });
     }
 
-    // ✅ If category is provided
+    // ✅ Otherwise → build filter
+    let filter = {};
+
     if (category) {
       filter.category = { $regex: category, $options: "i" };
     }
@@ -56,7 +69,7 @@ const getallgallary = async (req, res) => {
     const images = await eventsModel.find(filter);
 
     return res.status(200).json({
-      message: "images fetch successfully",
+      message: "Images fetched successfully",
       data: images,
     });
 
@@ -67,7 +80,6 @@ const getallgallary = async (req, res) => {
     });
   }
 };
-
 const updategallary = async (req, res) => {
     try {
       const { id } = req.params;
