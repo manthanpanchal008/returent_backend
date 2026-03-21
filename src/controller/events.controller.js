@@ -7,7 +7,7 @@ const addgallary = async (req, res) => {
   try {
     const { category } = req.body;
     const image = req.file;
-
+    console.log(image)
     // Upload image to ImageKit
     const imgResult = await imagekit.files.upload({
       file: image.buffer.toString("base64"),
@@ -39,15 +39,24 @@ const addgallary = async (req, res) => {
 const getallgallary = async (req, res) => {
   try {
     let filter = {};
+
+    const { id } = req.params;
     const { category } = req.query;
+
+    // ✅ If ID is provided
+    if (id) {
+      filter._id = id;
+    }
+
+    // ✅ If category is provided
     if (category) {
-        filter.category = { $regex: category, $options: "i" };;
-      }
-    const images = await eventsModel
-      .find(filter)
+      filter.category = { $regex: category, $options: "i" };
+    }
+
+    const images = await eventsModel.find(filter);
 
     return res.status(200).json({
-        message:"images fetch successfully",
+      message: "images fetch successfully",
       data: images,
     });
 
