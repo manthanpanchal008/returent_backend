@@ -38,8 +38,6 @@ const addgallary = async (req, res) => {
 // ✅ Get All Gallery Images
 const getallgallary = async (req, res) => {
   try {
-    console.log("hit");
-
     const { id } = req.params;
     const { category } = req.query;
 

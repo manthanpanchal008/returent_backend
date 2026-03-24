@@ -74,17 +74,14 @@ const updateItem = async (req, res) => {
       updatedData.img = imgResult.url;
     }
 
-    const updatedItem = await menuModel.findByIdAndUpdate(
-      itemId,
-      updatedData,
-      { new: true }
-    );
+    const updatedItem = await menuModel.findByIdAndUpdate(itemId, updatedData, {
+      new: true,
+    });
 
     res.status(200).json({
       message: "Item updated successfully",
       data: updatedItem,
     });
-
   } catch (error) {
     res.status(500).json({
       message: "Error updating item",
@@ -108,7 +105,6 @@ const deleteItem = async (req, res) => {
     res.status(200).json({
       message: "Item deleted successfully",
     });
-
   } catch (error) {
     res.status(500).json({
       message: "Error deleting item",
@@ -120,12 +116,27 @@ const deleteItem = async (req, res) => {
 const allitem = async (req, res) => {
   try {
     const { category } = req.query;
-
+    const { id } = req.params;
     let filter = {};
+
+    if (id) {
+      const singledata = await menuModel.findById(id);
+    
+    if (!singledata) {
+      return res.status(404).json({
+        message: "menu item not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Single menu item fetched",
+      data: singledata, // ✅ object (not array)
+    });
+  }
 
     // if category is provided → filter
     if (category) {
-      filter.category = { $regex: category, $options: "i" };;
+      filter.category = { $regex: category, $options: "i" };
     }
 
     const items = await menuModel.find(filter);
@@ -135,7 +146,6 @@ const allitem = async (req, res) => {
       count: items.length,
       data: items,
     });
-
   } catch (error) {
     res.status(500).json({
       message: "Error while fetching menu",
@@ -143,5 +153,4 @@ const allitem = async (req, res) => {
     });
   }
 };
-module.exports = { additem, allitem,updateItem ,deleteItem};
-
+module.exports = { additem, allitem, updateItem, deleteItem };
