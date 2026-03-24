@@ -6,8 +6,8 @@ const router = express.Router()
 
 router.get('/',getallgallary)
 router.get('/:id', getallgallary);
-router.post('/',upload.single("image"),addgallary)
-router.put("/:id", upload.single("image"), updategallary);
+router.post('/',upload.single("img"),addgallary)
+router.put("/:id", upload.single("img"), updategallary);
 router.delete("/:id", deletegallary);
 
 
