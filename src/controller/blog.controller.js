@@ -37,6 +37,22 @@ const addBlog = async (req, res) => {
 // ✅ Get All Blogs
 const getAllBlogs = async (req, res) => {
   try {
+    const { id } = req.params;
+
+    if (id) {
+      const singleblog = await blogModel.findById(id);
+
+      if (!singleblog) {
+        res.status(400).json({ message: "Error fetching blogitem" });
+      }
+
+      if (singleblog) {
+        res
+          .status(200)
+          .json({ message: "fetch blogitem successfully", data: singleblog });
+      }
+    }
+
     const blogs = await blogModel.find().sort({ createdAt: -1 });
 
     return res.status(200).json({

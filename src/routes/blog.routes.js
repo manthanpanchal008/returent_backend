@@ -5,6 +5,7 @@ const upload = require('../middleware/upload');
 const router  = express.Router()
 
 router.get('/',getAllBlogs) // router to get all services
+router.get('/:id',getAllBlogs) // router to get all services
 router.post('/', upload.single("image"),addBlog ) //  router to add service
 router.put("/:id", upload.single("image"), updateBlog);
 router.delete("/:id", deleteBlog);

@@ -43,6 +43,25 @@ const addteam = async (req, res) => {
 
 const getallteam = async (req, res) => {
   try {
+
+    const {id} = req.params;
+    if(id){
+      const singleteammember = await teamModel.findById(id)
+
+      if(!singleteammember){
+        return res.status(400).json({
+          message: "error while fetch team member",
+        })
+      }
+
+      if(singleteammember){
+        return res.status(200).json({
+          message: "team member fetch successfully",
+          data: singleteammember,
+        })
+      }
+    }
+
     const team = await teamModel.find();
 
     return res.status(200).json({

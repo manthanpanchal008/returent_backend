@@ -34,6 +34,24 @@ const addService = async (req, res) => {
 
 const getAllServices = async (req, res) => {
   try {
+    const {id} = req.params;
+    if(id){
+      const singleservice = await servicesModel.findById(id)
+
+      if(!singleservice){
+        return res.status(400).json({
+          message: "error while fetch service",
+        })
+      }
+
+      if(singleservice){
+        return res.status(200).json({
+          message: "services fetch successfully",
+          data: singleservice,
+        })
+      }
+
+    }
     const services = await servicesModel.find();
 
     return res.status(200).json({
