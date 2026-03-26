@@ -61,7 +61,7 @@ const login = async (req, res) => {
 
   // Set token in cookie and respond
   res.cookie("token", token);
-  res.status(200).json({ messgae: "login successful" });
+  res.status(200).json({user:userexits, messgae: "login successful" });
 };
 
 const users = async (req, res) => {
