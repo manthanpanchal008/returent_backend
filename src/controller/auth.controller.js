@@ -48,7 +48,7 @@ const login = async (req, res) => {
   if (!userexits) {
     return res.status(400).json({ messgae: "invalid credentials" });
   }
-  await sendEmail('manthanpanchal008@gmail.com',131213);
+  // await sendEmail('manthanpanchal008@gmail.com',131213);
   // Verify password
   const verifypassword = await bcrypt.compare(password, userexits.password);
 
