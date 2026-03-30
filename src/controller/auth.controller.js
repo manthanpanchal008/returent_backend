@@ -5,20 +5,22 @@ const sendEmail = require("../service/sendMail");
 
 // Register new user
 const register = async (req, res) => {
-  const { username, name, email, phone, password } = req.body;
-
+  const { username, name, email, phone, password,role } = req.body;
+  const generateOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
+  };
   // Check if user with same username or email already exists
   const isUserExist = await userModel.findOne({
     $or: [{ username }, { email }],
   });
 
   if (isUserExist) {
-    return res.status(402).json({ messgae: "user Already Exists" });
+    return res.status(402).json({ message: "user Already Exists" });
   }
 
   // Hash the password before storing
   const hashpassword = await bcrypt.hash(password, 10);
-
+  const otp = generateOTP()
   // Create user in database
   const user = await userModel.create({
     username,
@@ -26,16 +28,54 @@ const register = async (req, res) => {
     email,
     phone,
     password: hashpassword,
+    role,
+    otp,
+    otpExpiry: Date.now() + 5 * 60 * 1000,
   });
 
   // Generate JWT token
   const token = jwt.sign({ id: user._id,role:user.role }, process.env.JWT_SECRET);
-  console.log(token)
+  await sendEmail(email,otp);
+
   // Set token in cookie and respond
   res.cookie("token", token);
   res.status(200).json({ messgae: "Register succesfully", user });
 };
 
+const verifyotp = async(req,res)=> {
+    const {email,otp} = req.body
+  
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required" });
+    }
+    console.log("hit")
+    console.log(email,otp)
+    const user = await userModel.findOne({email})
+   
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+  
+    if (!user.otpExpiry || user.otpExpiry < Date.now()) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+   
+    if (user.otp.toString() !== otp.toString()) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+  
+    user.isVerified = true;
+    user.otp = null;
+    user.otpExpiry = null;
+  
+    await user.save();
+  
+    res.json({
+      success: true,
+      message: "Account verified successfully",
+    });
+  };
+  
 // Login existing user
 const login = async (req, res) => {
   const { username, email, password } = req.body;
@@ -143,4 +183,4 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { register, login, users ,updateUser,deleteUser};
+module.exports = { register, login, users ,updateUser,deleteUser,verifyotp};
